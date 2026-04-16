@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Does Your Task Actually Need AI?</title>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-DW1WLNR08G"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-DW1WLNR08G');
+  window.addEventListener('load', function() {
+    gtag('event', 'tool_opened', { tool_name: 'does-your-task-need-ai' });
+  });
+</script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --sidebar-bg: #6C2C25;
+  --sidebar-border: rgba(255,255,255,0.1);
+  --sidebar-text: rgba(255,255,255,0.5);
+  --sidebar-text-active: rgba(255,255,255,0.92);
+  --sidebar-text-mid: rgba(255,255,255,0.7);
+  --workspace-bg: #F5F4F1;
+  --panel-bg: #ffffff;
+  --panel-border: rgba(0,0,0,0.07);
+  --text: #1a1916;
+  --text-muted: #6b6a62;
+  --text-faint: #a09f96;
+  --accent: #EB5E3A;
+  --accent-hover: #c94a2a;
+  --amber: #BA7517;
+  --amber-light: #FAEEDA;
+  --red: #C04A22;
+  --red-light: #FAECE7;
+  --yes-color: #0F6E56;
+  --yes-light: #E1F5EE;
+  --topbar-bg: #ffffff;
+  --topbar-border: rgba(0,0,0,0.08);
+  --chip-hover-bg: #f0eeeb;
+  --chip-hover-border: #EB5E3A;
+}
+
+html, body { height: 100%; font-family: 'Inter', sans-serif; background: var(--workspace-bg); color: var(--text); font-size: 13px; }
+
+.app { display: flex; height: 100vh; overflow: hidden; }
+
+/* SIDEBAR */
+.sidebar { width: 240px; min-width: 240px; background: var(--sidebar-bg); display: flex; flex-direction: column; border-right: 0.5px solid var(--sidebar-border); overflow-y: auto; overflow-x: hidden; }
+.sidebar::-webkit-scrollbar { width: 3px; }
+.sidebar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 3px; }
+
+.sidebar-logo { padding: 22px 18px 18px; border-bottom: 0.5px solid var(--sidebar-border); flex-shrink: 0; }
+.logo-row { display: flex; align-items: center; gap: 8px; margin-bottom: 5px; }
+.logo-dot { width: 9px; height: 9px; border-radius: 50%; background: #F5F4F1; }
+.logo-text { font-size: 13px; font-weight: 600; color: var(--sidebar-text-active); letter-spacing: -0.01em; }
+.logo-sub { font-size: 11px; color: var(--sidebar-text); line-height: 1.4; }
+
+.sidebar-section { padding: 18px 18px 10px; border-bottom: 0.5px solid var(--sidebar-border); }
+.sidebar-section:last-of-type { border-bottom: none; }
+.section-heading { font-size: 10px; font-weight: 600; color: var(--sidebar-text); text-transform: uppercase; letter-spacing: 0.09em; margin-bottom: 10px; }
+
+.nav-active { display: flex; align-items: center; gap: 8px; padding: 8px 10px; border-radius: 7px; background: rgba(242,237,189,0.12); color: var(--sidebar-text-active); font-size: 12px; font-weight: 500; margin-bottom: 4px; }
+.nav-dot { width: 6px; height: 6px; border-radius: 50%; background: #F5F4F1; flex-shrink: 0; }
+
+.kb-item { margin-bottom: 12px; }
+.kb-item:last-child { margin-bottom: 0; }
+.kb-item-label { font-size: 10px; font-weight: 600; color: rgba(242,237,189,0.7); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 4px; }
+.kb-item-desc { font-size: 11px; color: var(--sidebar-text); line-height: 1.55; }
+
+.verdict-legend { margin-top: 4px; }
+.vl-row { display: flex; align-items: flex-start; gap: 8px; margin-bottom: 9px; }
+.vl-row:last-child { margin-bottom: 0; }
+.vl-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; margin-top: 3px; }
+.vl-content { flex: 1; }
+.vl-label { font-size: 11px; font-weight: 500; color: var(--sidebar-text-active); margin-bottom: 1px; }
+.vl-desc { font-size: 10px; color: var(--sidebar-text); line-height: 1.4; }
+
+.sidebar-stats { padding: 14px 18px; border-top: 0.5px solid var(--sidebar-border); border-bottom: 0.5px solid var(--sidebar-border); }
+.stat-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 7px; }
+.stat-row:last-child { margin-bottom: 0; }
+.stat-lbl { font-size: 11px; color: var(--sidebar-text); }
+.stat-val { font-size: 11px; font-weight: 500; }
+
+.sidebar-credit { padding: 14px 18px; margin-top: auto; }
+.credit-text { font-size: 10px; color: var(--sidebar-text); line-height: 1.6; }
+.credit-text a { color: rgba(242,237,189,0.6); text-decoration: none; }
+.credit-text a:hover { color: #F5F4F1; }
+
+/* MAIN */
+.main { flex: 1; display: flex; flex-direction: column; overflow: hidden; min-width: 0; }
+
+/* TOPBAR */
+.topbar { background: var(--topbar-bg); border-bottom: 0.5px solid var(--topbar-border); padding: 0 24px; height: 52px; display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
+.topbar-title { font-size: 13px; font-weight: 600; color: var(--text); }
+.topbar-sep { color: var(--text-faint); margin: 0 6px; }
+.topbar-sub { font-size: 12px; color: var(--text-muted); }
+.topbar-right { display: flex; align-items: center; gap: 8px; }
+.metric-pill { display: flex; align-items: center; gap: 5px; background: rgba(0,0,0,0.05); border: 0.5px solid rgba(0,0,0,0.08); border-radius: 20px; padding: 4px 10px; font-size: 11px; color: var(--text-muted); }
+.metric-pill strong { color: var(--text); font-weight: 500; }
+.metric-pill.free { background: rgba(235,94,58,0.08); border-color: rgba(235,94,58,0.2); }
+.metric-pill.free strong { color: var(--accent); }
+
+/* WORKSPACE */
+.workspace { flex: 1; overflow-y: auto; padding: 24px; display: flex; flex-direction: column; gap: 16px; }
+.workspace::-webkit-scrollbar { width: 4px; }
+.workspace::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.12); border-radius: 4px; }
+
+/* DESCRIPTION PANEL */
+.desc-panel { background: var(--sidebar-bg); border-radius: 12px; padding: 18px 22px; }
+.desc-text { font-size: 13px; color: rgba(255,255,255,0.75); line-height: 1.75; }
+.desc-text strong { color: #F5F4F1; font-weight: 500; }
+.desc-byline { margin-top: 10px; font-size: 11px; color: rgba(255,255,255,0.4); }
+.desc-byline a { color: rgba(242,237,189,0.55); text-decoration: none; }
+.desc-byline a:hover { color: #F5F4F1; }
+
+/* INPUT PANEL */
+.input-panel { background: var(--panel-bg); border: 0.5px solid var(--panel-border); border-radius: 12px; overflow: hidden; }
+.panel-header { padding: 13px 18px; border-bottom: 0.5px solid var(--panel-border); display: flex; align-items: center; justify-content: space-between; }
+.panel-title { font-size: 12px; font-weight: 500; color: var(--text); display: flex; align-items: center; gap: 7px; }
+.panel-badge { font-size: 10px; padding: 2px 8px; border-radius: 20px; background: rgba(235,94,58,0.1); color: var(--accent); font-weight: 500; }
+.panel-body { padding: 16px 18px; }
+.input-row { display: flex; gap: 10px; align-items: flex-start; }
+.task-input { flex: 1; border: 0.5px solid rgba(0,0,0,0.12); border-radius: 8px; padding: 10px 14px; font-family: 'Inter', sans-serif; font-size: 13px; color: var(--text); background: var(--workspace-bg); resize: vertical; outline: none; min-height: 72px; line-height: 1.6; transition: border-color 0.2s, background 0.2s; }
+.task-input:focus { border-color: var(--accent); background: #fff; }
+.task-input::placeholder { color: var(--text-faint); }
+.analyse-btn { background: var(--accent); color: #fff; border: none; border-radius: 8px; padding: 10px 20px; font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 500; cursor: pointer; white-space: nowrap; display: flex; align-items: center; gap: 6px; transition: background 0.2s; flex-shrink: 0; }
+.analyse-btn:hover { background: var(--accent-hover); }
+.analyse-btn:active { transform: scale(0.98); }
+
+.examples-wrap { margin-top: 12px; }
+.examples-lbl { font-size: 10px; color: var(--text-faint); margin-bottom: 7px; display: block; }
+.examples-row { display: flex; align-items: center; gap: 7px; overflow-x: auto; padding-bottom: 4px; scrollbar-width: none; }
+.examples-row::-webkit-scrollbar { display: none; }
+.chip { font-size: 11px; padding: 4px 10px; border-radius: 20px; border: 0.5px solid rgba(0,0,0,0.1); background: var(--workspace-bg); color: var(--text-muted); cursor: pointer; transition: all 0.15s; white-space: nowrap; flex-shrink: 0; }
+.chip:hover { border-color: var(--accent); color: var(--accent); background: var(--chip-hover-bg); }
+
+/* RESULTS */
+.results-grid { display: grid; grid-template-columns: 280px 1fr; gap: 16px; }
+.results-grid.hidden { display: none; }
+
+/* VERDICT PANEL */
+.verdict-panel { background: var(--panel-bg); border: 0.5px solid var(--panel-border); border-radius: 12px; display: flex; flex-direction: column; }
+.verdict-header { padding: 13px 16px; border-bottom: 0.5px solid var(--panel-border); }
+.verdict-hlabel { font-size: 10px; font-weight: 600; color: var(--text-faint); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 9px; }
+.verdict-tag { display: inline-flex; align-items: center; gap: 7px; border-radius: 8px; padding: 8px 12px; font-size: 12px; font-weight: 500; width: 100%; }
+.verdict-tag.no { background: var(--red-light); color: var(--red); }
+.verdict-tag.partial { background: var(--amber-light); color: var(--amber); }
+.verdict-tag.yes { background: var(--yes-light); color: var(--yes-color); }
+.verdict-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+.verdict-tag.no .verdict-dot { background: var(--red); }
+.verdict-tag.partial .verdict-dot { background: var(--amber); }
+.verdict-tag.yes .verdict-dot { background: var(--yes-color); }
+.verdict-body { padding: 14px 16px; flex: 1; }
+.verdict-reasoning { font-size: 12px; color: var(--text-muted); line-height: 1.75; }
+.reset-link { font-size: 12px; font-weight: 500; color: var(--accent); background: rgba(235,94,58,0.08); border: 0.5px solid rgba(235,94,58,0.25); border-radius: 6px; cursor: pointer; padding: 7px 12px; text-decoration: none; margin-top: 16px; display: inline-block; transition: background 0.15s; }
+.reset-link:hover { background: rgba(235,94,58,0.15); }
+.verdict-footer { padding: 12px 16px; border-top: 0.5px solid var(--panel-border); }
+.disclaimer-text { font-size: 11px; color: var(--text-faint); line-height: 1.6; display: flex; gap: 6px; align-items: flex-start; }
+
+/* TOOLS PANEL */
+.tools-panel { background: var(--panel-bg); border: 0.5px solid var(--panel-border); border-radius: 12px; overflow: hidden; }
+.tools-header { padding: 13px 18px; border-bottom: 0.5px solid var(--panel-border); display: flex; align-items: center; justify-content: space-between; }
+.tools-header-left { font-size: 12px; font-weight: 500; color: var(--text); }
+.tools-count { font-size: 10px; color: var(--text-faint); }
+
+/* TOOL ROW — always expanded */
+.tool-row { padding: 14px 18px; border-bottom: 0.5px solid var(--panel-border); background: var(--panel-bg); }
+.tool-row:last-child { border-bottom: none; }
+.tool-row-top { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+.tool-row-name { font-size: 13px; font-weight: 600; color: var(--text); flex: 1; }
+.tool-type-pill { font-size: 10px; font-weight: 500; padding: 2px 8px; border-radius: 20px; white-space: nowrap; }
+.pill-auto { background: #E6F1FB; color: #0C447C; }
+.pill-ai { background: var(--yes-light); color: #085041; }
+.pill-hybrid { background: #EEEDFE; color: #3C3489; }
+.tool-what { font-size: 12px; color: var(--text-muted); line-height: 1.65; margin-bottom: 12px; }
+.tool-meta-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px; }
+.meta-cell { background: var(--workspace-bg); border-radius: 7px; padding: 8px 10px; }
+.meta-cell-label { font-size: 10px; color: var(--text-faint); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px; }
+.meta-cell-val { font-size: 11px; color: var(--text); line-height: 1.5; }
+.meta-cell-val.green { color: #0F6E56; font-weight: 500; }
+.meta-cell-val.amber { color: var(--amber); }
+.dots-row { display: flex; gap: 3px; margin-bottom: 4px; }
+.dot { width: 8px; height: 8px; border-radius: 50%; }
+.dot-on { background: var(--accent); }
+.dot-off { background: #dddbd4; }
+.setup-sub { font-size: 10px; color: var(--text-faint); }
+.avoid-strip { background: #fff8f5; border: 0.5px solid rgba(192,74,34,0.15); border-radius: 7px; padding: 7px 10px; font-size: 11px; color: #993C1D; line-height: 1.5; }
+.avoid-strip strong { font-weight: 500; }
+
+/* EMPTY STATE */
+.empty-panel { background: var(--panel-bg); border: 0.5px solid var(--panel-border); border-radius: 12px; padding: 52px 24px; text-align: center; }
+.empty-icon-wrap { width: 44px; height: 44px; border-radius: 11px; background: var(--workspace-bg); display: flex; align-items: center; justify-content: center; margin: 0 auto 14px; }
+.empty-title { font-size: 13px; font-weight: 500; color: var(--text); margin-bottom: 7px; }
+.empty-sub { font-size: 12px; color: var(--text-muted); line-height: 1.65; max-width: 380px; margin: 0 auto; }
+
+@media (max-width: 820px) {
+  .sidebar { width: 200px; min-width: 200px; }
+  .results-grid { grid-template-columns: 1fr; }
+}
+@media (max-width: 640px) {
+  .sidebar { display: none; }
+  .topbar-right { display: none; }
+  .workspace { padding: 14px; }
+  .tool-meta-grid { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-row">
+        <div class="logo-dot"></div>
+        <span class="logo-text">Task Intelligence</span>
+      </div>
+      <div class="logo-sub">Automation decision tool · all teams</div>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="section-heading">Workspace</div>
+      <div class="nav-active">
+        <div class="nav-dot"></div>
+        Task Analyser
+      </div>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="section-heading">Knowledge Base</div>
+
+      <div class="kb-item">
+        <div class="kb-item-label">16 task types mapped</div>
+        <div class="kb-item-desc">Common operations workflows across onboarding, payments, reporting, escalations, churn, vendor evaluation, SOP generation and more — each pre-assessed for AI suitability.</div>
+      </div>
+
+      <div class="kb-item">
+        <div class="kb-item-label">13 tools evaluated</div>
+        <div class="kb-item-desc">n8n, Zapier, Cloudflare Workers, Stripe Webhooks, GitHub Actions, Airtable, Notion, Claude API, Claude Projects, Claude Agents, n8n+Claude, Python+Claude, Google Sheets+Claude.</div>
+      </div>
+
+      <div class="kb-item">
+        <div class="kb-item-label">3 verdict tiers</div>
+        <div class="verdict-legend">
+          <div class="vl-row">
+            <div class="vl-dot" style="background:#C04A22;"></div>
+            <div class="vl-content">
+              <div class="vl-label">No — automate it</div>
+              <div class="vl-desc">Rule-based, no judgment needed. AI is overkill and wasteful here.</div>
+            </div>
+          </div>
+          <div class="vl-row">
+            <div class="vl-dot" style="background:#BA7517;"></div>
+            <div class="vl-content">
+              <div class="vl-label">Partially — AI assists</div>
+              <div class="vl-desc">Mostly automatable; AI earns its place in one specific decision step.</div>
+            </div>
+          </div>
+          <div class="vl-row">
+            <div class="vl-dot" style="background:#0F6E56;"></div>
+            <div class="vl-content">
+              <div class="vl-label">Yes — AI earns it</div>
+              <div class="vl-desc">Unstructured input, judgment required, patterns across variable data. This is where AI stops being a buzzword.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="sidebar-stats">
+      <div class="stat-row"><span class="stat-lbl">No AI needed</span><span class="stat-val" style="color:#e8806a;">5 task types</span></div>
+      <div class="stat-row"><span class="stat-lbl">AI assists</span><span class="stat-val" style="color:#e0a84a;">5 task types</span></div>
+      <div class="stat-row"><span class="stat-lbl">AI earns it</span><span class="stat-val" style="color:#5DCAA5;">6 task types</span></div>
+    </div>
+
+    <div class="sidebar-credit">
+      <div class="credit-text">
+        Built by <a href="https://www.linkedin.com/in/vikrantsharma10/" target="_blank">Vikrant Sharma</a><br>
+        Free · runs locally in your browser<br>
+        No data stored or sent anywhere
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main">
+
+    <div class="topbar">
+      <div style="display:flex;align-items:center;">
+        <span class="topbar-title">Does your task actually need AI?</span>
+        <span class="topbar-sep">/</span>
+        <span class="topbar-sub">Task Analyser · all teams</span>
+      </div>
+      <div class="topbar-right">
+        <div class="metric-pill"><strong>16</strong>&nbsp;tasks</div>
+        <div class="metric-pill"><strong>13</strong>&nbsp;tools</div>
+        <div class="metric-pill free"><strong>Free</strong></div>
+      </div>
+    </div>
+
+    <div class="workspace">
+
+      <!-- DESCRIPTION -->
+      <div class="desc-panel">
+        <div class="desc-text">
+          Most tasks <strong>don't need AI</strong>. They need the right automation tool, the right configuration and someone who actually understands the difference. Describe your task; this tool tells you where AI earns its place and where it's just expensive noise.
+        </div>
+        <div class="desc-text" style="margin-top:10px; font-size:12px; color:rgba(255,255,255,0.55);">
+          Built for anyone making automation decisions — operations, finance, sales, marketing, customer success or product. If your team runs a process, this tool is for you.
+        </div>
+        <div class="desc-byline">A free tool by <a href="https://www.linkedin.com/in/vikrantsharma10/" target="_blank">Vikrant Sharma</a> · Operations Leader · Automation Practitioner · AI Builder<br><span style="color:rgba(255,255,255,0.35); font-size:10px;">Operations leader who stopped waiting for developers and started building; AI pipelines, agentic workflows and automation systems that actually solve the right problem.</span></div>
+      </div>
+
+      <!-- INPUT -->
+      <div class="input-panel">
+        <div class="panel-header">
+          <div class="panel-title">
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><rect x="0.5" y="0.5" width="11" height="11" rx="2" stroke="#EB5E3A" stroke-width="1"/><path d="M3 6h6M6 3v6" stroke="#EB5E3A" stroke-width="1.2" stroke-linecap="round"/></svg>
+            New analysis
+          </div>
+          <span class="panel-badge">ready</span>
+        </div>
+        <div class="panel-body">
+          <div class="input-row">
+            <textarea class="task-input" id="taskInput" placeholder="Describe your task in plain language. e.g. I want to automatically flag accounts that haven't logged in for 14 days and send a personalised re-engagement message..." rows="3"></textarea>
+            <button class="analyse-btn" onclick="analyse()" id="analyseBtn">
+              <svg width="11" height="11" viewBox="0 0 11 11" fill="none"><path d="M2 5.5h7M5.5 2l3.5 3.5L5.5 9" stroke="#fff" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              Run analysis
+            </button>
+          </div>
+          <div class="examples-wrap">
+            <span class="examples-lbl">Try an example → scroll for more</span>
+            <div class="examples-row">
+              <span class="chip" onclick="fillExample(this)">Send payment reminders</span>
+              <span class="chip" onclick="fillExample(this)">Summarise 500 support tickets</span>
+              <span class="chip" onclick="fillExample(this)">Detect churn signals</span>
+              <span class="chip" onclick="fillExample(this)">Route escalations to the right team</span>
+              <span class="chip" onclick="fillExample(this)">Generate weekly account performance report</span>
+              <span class="chip" onclick="fillExample(this)">Move new CRM signups between tools</span>
+              <span class="chip" onclick="fillExample(this)">Auto-generate SOP from process steps</span>
+              <span class="chip" onclick="fillExample(this)">Score renewal risk across all accounts</span>
+              <span class="chip" onclick="fillExample(this)">Evaluate and shortlist vendors from proposals</span>
+              <span class="chip" onclick="fillExample(this)">Run a credit check on new fintech applicants</span>
+              <span class="chip" onclick="fillExample(this)">Onboard new customers automatically</span>
+              <span class="chip" onclick="fillExample(this)">Analyse customer feedback at volume</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RESULTS -->
+      <div class="results-grid hidden" id="resultsGrid">
+        <div class="verdict-panel">
+          <div class="verdict-header">
+            <div class="verdict-hlabel">Verdict</div>
+            <div id="verdictTag"></div>
+          </div>
+          <div class="verdict-body">
+            <p class="verdict-reasoning" id="verdictReasoning"></p>
+            <button class="reset-link" onclick="resetTool()">← Analyse a different task</button>
+          </div>
+          <div class="verdict-footer">
+            <div class="disclaimer-text">
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none" style="flex-shrink:0;margin-top:1px;"><circle cx="6" cy="6" r="5" stroke="#a09f96" stroke-width="1"/><path d="M6 5.5v3" stroke="#a09f96" stroke-width="1.1" stroke-linecap="round"/><circle cx="6" cy="3.8" r="0.5" fill="#a09f96"/></svg>
+              Every company has edge cases. This is a starting point for your thinking; not a definitive directive. Use your own judgment before committing to any tool.
+            </div>
+          </div>
+        </div>
+
+        <div class="tools-panel">
+          <div class="tools-header">
+            <div class="tools-header-left">Recommended tools</div>
+            <div class="tools-count" id="toolsCount"></div>
+          </div>
+          <div id="toolRows"></div>
+        </div>
+      </div>
+
+      <!-- EMPTY STATE -->
+      <div id="emptyState">
+        <div class="empty-panel">
+          <div class="empty-icon-wrap">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="8" stroke="#a09f96" stroke-width="1.2"/><path d="M7 10l2.5 2.5L14 7" stroke="#a09f96" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <div class="empty-title">Describe your task above to get started</div>
+          <div class="empty-sub">Type what you are trying to automate or improve. The analyser matches it against 16 common task types and tells you whether it needs AI, simple automation, or a combination — with honest cost and setup reality attached.</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+const TOOLS = {
+  n8n: { name:'n8n', type:'automation', what:'Open-source workflow builder you host yourself. Visual canvas, no execution limits, connects to almost anything via API. The workhorse of serious ops automation at near-zero cost.', bestFor:'Data routing; multi-step workflows; notifications; anything Zapier does without per-task charges at scale', cost:'Free self-hosted · ~$5/mo on Railway', costType:'green', setup:3, setupLabel:'moderate · needs basic technical comfort', avoid:'Team needs zero technical setup; use Zapier instead' },
+  zapier: { name:'Zapier', type:'automation', what:'The most beginner-friendly automation tool. Connects 6,000+ apps with no code. You pay per task run so costs climb fast at volume.', bestFor:'Simple one-step triggers; quick wins; non-technical teams who need something working today', cost:'Free (100 tasks/mo) · $19.99/mo starter', costType:'amber', setup:1, setupLabel:'easy · anyone can set this up', avoid:'High-volume tasks; per-task pricing spirals fast above the free tier' },
+  cloudflare: { name:'Cloudflare Workers', type:'automation', what:'Serverless code that runs globally, instantly, with no server to manage. Triggered by HTTP requests or schedules. Built for speed and real-time logic.', bestFor:'Credit checks; real-time data validation; lightweight API logic requiring sub-100ms response', cost:'Free (100k req/day) · $5/mo paid', costType:'green', setup:4, setupLabel:'technical · requires JavaScript knowledge', avoid:'Non-technical teams; needs someone comfortable writing code' },
+  stripe: { name:'Stripe Webhooks', type:'automation', what:"Stripe's built-in event system. When a payment fails or a subscription changes, Stripe fires an event your tools can listen to and act on instantly.", bestFor:'Failed payment handling; subscription changes; payment reminders triggered by real billing events', cost:'Free · included with Stripe', costType:'green', setup:3, setupLabel:'moderate · needs webhook configuration', avoid:"You're not using Stripe as your payment processor" },
+  github: { name:'GitHub Actions', type:'automation', what:'Free scheduler and automation runner built into GitHub. Runs scripts on a timer or triggered by events. No server needed; 2,000 free minutes per month.', bestFor:'Scheduled data pulls; daily batch jobs; reports that run reliably on a timetable', cost:'Free (2,000 min/mo)', costType:'green', setup:4, setupLabel:'technical · needs scripting knowledge', avoid:'Real-time triggers; GitHub Actions runs on schedules, not instant events' },
+  airtable: { name:'Airtable Automations', type:'automation', what:"Built-in automation layer inside Airtable. If your team already lives in Airtable, this is the fastest way to automate without leaving it.", bestFor:'Record-triggered workflows; status change notifications; lightweight CRM automations', cost:'Free (100 runs/mo) · $20/mo team', costType:'amber', setup:2, setupLabel:'easy · straightforward inside Airtable', avoid:"Your team doesn't already use Airtable; no point adopting it just for automations" },
+  notion: { name:'Notion Automations', type:'automation', what:'Automation built into Notion. Triggers actions when database properties change. Simple and limited but fast to set up for teams already on Notion.', bestFor:'SOP triggers; project status workflows; internal notifications on process stage changes', cost:'Free basic · $10/mo Plus plan', costType:'amber', setup:2, setupLabel:'easy · works natively inside Notion', avoid:'Complex multi-step logic; Notion automations are intentionally simple and hit limits fast' },
+  claudeapi: { name:'Claude API', type:'ai', what:'Direct programmatic access to Claude. Feed it documents, data or text at scale and get structured intelligent output back. This is AI doing real work, not chat.', bestFor:'Batch document processing; classification at volume; language understanding across large variable inputs', cost:'~$0.003 per 1k tokens · pay per use', costType:'amber', setup:4, setupLabel:'technical · needs API integration', avoid:'Simple rule-based tasks; you are spending AI budget where no judgment is needed' },
+  claudeprojects: { name:'Claude Projects', type:'ai', what:'A persistent Claude workspace with a custom system prompt and your uploaded knowledge base. Claude remembers your context across every conversation in that project.', bestFor:'Internal knowledge assistants; teams needing Claude trained on their SOPs, playbooks or internal docs', cost:'Included in Claude Pro · $20/mo', costType:'green', setup:2, setupLabel:'easy · no code, just configuration', avoid:"You need real-time data; Claude Projects works from uploaded docs, not live feeds" },
+  claudeagents: { name:'Claude Agents', type:'ai', what:'Claude operating autonomously across multiple steps; browsing, writing, deciding and acting without someone prompting each move. Heavy lifting for complex ops workflows.', bestFor:'Multi-step research tasks; end-to-end workflows requiring judgment at each stage; tasks too complex for a single prompt', cost:'Claude Pro $20/mo · or API usage', costType:'amber', setup:4, setupLabel:'technical · needs careful orchestration', avoid:'Defined repeatable tasks with fixed inputs; agents are overkill for simple structured flows' },
+  n8nclaude: { name:'n8n + Claude', type:'hybrid', what:'n8n handles the trigger and data routing; Claude handles the thinking step in the middle. The most versatile ops stack at near-zero cost. This is how serious ops teams build.', bestFor:'Onboarding personalisation; escalation routing; performance summaries; automation with one intelligent decision inside', cost:'~$5/mo n8n on Railway + Claude Pro $20/mo', costType:'green', setup:4, setupLabel:'technical · needs comfort with APIs and n8n', avoid:'Teams with no technical capacity; needs someone comfortable connecting systems' },
+  pythonclaude: { name:'Python + Claude API', type:'hybrid', what:'Custom scripts feeding data directly into Claude at scale. No UI, no workflow canvas; pure programmatic power for high-volume intelligent processing across hundreds of records.', bestFor:'Churn detection; renewal risk scoring; anomaly interpretation; large datasets through AI judgment', cost:'Python free · Claude API pay per token', costType:'amber', setup:5, setupLabel:'developer-level · needs Python and API knowledge', avoid:'Non-technical teams; needs a developer or someone genuinely comfortable writing Python' },
+  sheetsclaude: { name:'Google Sheets + Claude', type:'hybrid', what:'Sheets handles data storage; Claude reads it and generates summaries, flags anomalies or drafts outputs. The lowest-friction entry point into AI-assisted ops.', bestFor:'Account performance summaries; SLA monitoring; lightweight renewal risk flags for non-technical teams', cost:'Sheets free · Claude Pro $20/mo', costType:'green', setup:2, setupLabel:'easy · no code needed', avoid:"Real-time triggers; Sheets + Claude is a manual pull workflow, not an automated pipeline" }
+};
+
+const TASK_MAP = [
+  { keywords:['notification','notify','alert','remind','reminder','message','send','email','slack','ping','dm','announce'], verdict:'no', reason:'This is a trigger-based task with a fixed message and no judgment needed. AI is overkill here; a simple automation tool runs this cheaper, faster and more reliably.', tools:['n8n','zapier','airtable','notion'] },
+  { keywords:['payment','invoice','overdue','billing','subscription','failed','charge','stripe','renewal payment','unpaid'], verdict:'no', reason:'Payment workflows are rule-based; fixed triggers, defined retry logic, templated communications. No interpretation needed. Automation handles this perfectly.', tools:['stripe','n8n','zapier'] },
+  { keywords:['move data','sync','transfer','copy','push','pull','integrate','connect','import','export','route data','data between','crm','signup'], verdict:'no', reason:'Structured data moving between defined fields is pure routing logic. No AI judgment required; automation tools do this cheaper and more reliably.', tools:['n8n','zapier','airtable'] },
+  { keywords:['credit','credit check','credit score','fintech','financial check','creditworthiness','loan','lending','applicant'], verdict:'no', reason:'Credit checks run against fixed thresholds and defined rules. The logic is deterministic; no language understanding or judgment needed. Keep AI out of this one.', tools:['cloudflare','n8n','github'] },
+  { keywords:['schedule','scheduled','daily','weekly','monthly','batch','recurring','every day','every week'], verdict:'no', reason:'Scheduled or recurring tasks are automation territory. A cron-style scheduler runs these without AI involvement at essentially zero cost.', tools:['github','n8n','zapier'] },
+  { keywords:['onboard','onboarding','self-onboard','new user','new account','new customer','welcome','account creation'], verdict:'partial', reason:'The flow itself is automatable; triggers, data capture, account setup. AI earns its place personalising the experience and handling edge cases that fall outside your standard flow.', tools:['n8nclaude','zapier','claudeprojects'] },
+  { keywords:['summary','summarise','summarize','report','performance','account performance','weekly report','monthly report'], verdict:'partial', reason:'Data aggregation and delivery is automation. The narrative layer; turning numbers into insight and flagging what matters; is where AI genuinely adds value.', tools:['sheetsclaude','n8nclaude','claudeapi'] },
+  { keywords:['escalat','route','routing','assign','triage','priority','ticket','support ticket','issue routing','right team'], verdict:'partial', reason:'Simple keyword-based routing is automation. Context-based judgment on priority, urgency and ownership with ambiguous inputs; that is where AI steps in.', tools:['n8nclaude','claudeprojects','zapier'] },
+  { keywords:['sla','breach','predict','at risk','monitor','threshold','violation','service level'], verdict:'partial', reason:'Threshold monitoring is pure automation. But predicting a breach before it happens; reading patterns across multiple signals before the line is crossed; needs AI judgment.', tools:['n8nclaude','pythonclaude','sheetsclaude'] },
+  { keywords:['anomaly','unusual','spike','drop','deviation','outlier','metric','detect change','flag','something wrong'], verdict:'partial', reason:'Statistical anomaly detection can be automated. But interpreting what the anomaly means in context and what to do about it; that is where AI earns its place.', tools:['n8nclaude','pythonclaude','sheetsclaude'] },
+  { keywords:['churn','churning','losing customer','retention risk','cancel','cancellation','leaving','dropping off','disengaged','re-engagement','logged in','login'], verdict:'yes', reason:'Churn signals live across multiple unstructured data points; login frequency, support tone, usage gaps, response patterns. No rule catches all of them. AI reads the full picture.', tools:['pythonclaude','n8nclaude','claudeapi'] },
+  { keywords:['contract','document','legal','terms','clause','agreement','policy','doc review','volume'], verdict:'yes', reason:'Contracts and documents are unstructured, variable in format and require judgment on what matters. At volume, this is exactly what AI is built for.', tools:['claudeapi','claudeprojects','claudeagents'] },
+  { keywords:['feedback','customer feedback','voice of customer','voc','review','survey','sentiment','theme','opinion','comments'], verdict:'yes', reason:'Synthesising themes and sentiment from unstructured feedback at volume is classic AI territory. No rule-based tool does this; you need language understanding.', tools:['claudeapi','pythonclaude','claudeprojects'] },
+  { keywords:['vendor','supplier','evaluate','evaluation','rfp','proposal','shortlist','procurement','supplier assessment'], verdict:'yes', reason:'Vendor evaluation involves multiple unstructured inputs, comparative judgment and qualitative scoring across inconsistent formats. AI reasoning is the right tool here.', tools:['claudeagents','claudeprojects','claudeapi'] },
+  { keywords:['sop','standard operating procedure','process document','write process','document process','process steps','procedure'], verdict:'yes', reason:"Generating SOPs from recorded steps requires structuring variable, unformatted input into clean professional documentation. Language generation is AI's home turf.", tools:['claudeprojects','claudeapi','claudeagents'] },
+  { keywords:['renewal','renew','renewal risk','account health','portfolio','account score','at risk account','csm','customer success'], verdict:'yes', reason:'Renewal risk scoring combines quantitative and qualitative signals across an entire portfolio. Reading that picture accurately across many accounts needs AI pattern recognition.', tools:['pythonclaude','n8nclaude','claudeapi'] }
+];
+
+const VERDICT_CONFIG = {
+  no: { label:'No — automate it, not AI' },
+  partial: { label:'Partially — AI assists one step' },
+  yes: { label:'Yes — AI genuinely earns it' }
+};
+
+const TYPE_PILL = { automation:'pill-auto', ai:'pill-ai', hybrid:'pill-hybrid' };
+const TYPE_LABEL = { automation:'automation', ai:'AI', hybrid:'hybrid' };
+
+function fillExample(el) {
+  document.getElementById('taskInput').value = el.textContent;
+  document.getElementById('taskInput').focus();
+}
+
+function buildDots(n) {
+  let h = '<div class="dots-row">';
+  for (let i=1;i<=5;i++) h += `<div class="dot ${i<=n?'dot-on':'dot-off'}"></div>`;
+  return h + '</div>';
+}
+
+function matchTask(input) {
+  const lower = input.toLowerCase();
+  let best = null, bestScore = 0;
+  for (const entry of TASK_MAP) {
+    let score = 0;
+    for (const kw of entry.keywords) { if (lower.includes(kw)) score++; }
+    if (score > bestScore) { bestScore = score; best = entry; }
+  }
+  if (!best || bestScore === 0) {
+    const hasAI = /\b(ai|claude|gpt|llm|language model|intelligent)\b/.test(lower);
+    const hasAuto = /\b(automat|workflow|trigger|schedule|connect|sync)\b/.test(lower);
+    best = hasAI && !hasAuto ? TASK_MAP[11] : hasAuto && !hasAI ? TASK_MAP[0] : TASK_MAP[6];
+  }
+  return best;
+}
+
+function analyse() {
+  const input = document.getElementById('taskInput').value.trim();
+  if (!input || input.length < 8) {
+    document.getElementById('taskInput').style.borderColor = '#EB5E3A';
+    setTimeout(() => document.getElementById('taskInput').style.borderColor = '', 1500);
+    return;
+  }
+
+  gtag('event', 'task_analysed', { tool_name: 'does-your-task-need-ai', task_length: input.length });
+
+  const match = matchTask(input);
+  const vc = VERDICT_CONFIG[match.verdict];
+
+  document.getElementById('verdictTag').innerHTML = `<div class="verdict-tag ${match.verdict}"><div class="verdict-dot"></div>${vc.label}</div>`;
+  document.getElementById('verdictReasoning').textContent = match.reason;
+  document.getElementById('toolsCount').textContent = `${match.tools.length} tools matched`;
+
+  const rows = document.getElementById('toolRows');
+  rows.innerHTML = '';
+  for (const tid of match.tools) {
+    const t = TOOLS[tid];
+    if (!t) continue;
+    rows.innerHTML += `
+      <div class="tool-row">
+        <div class="tool-row-top">
+          <span class="tool-row-name">${t.name}</span>
+          <span class="tool-type-pill ${TYPE_PILL[t.type]}">${TYPE_LABEL[t.type]}</span>
+        </div>
+        <p class="tool-what">${t.what}</p>
+        <div class="tool-meta-grid">
+          <div class="meta-cell">
+            <div class="meta-cell-label">Best for</div>
+            <div class="meta-cell-val">${t.bestFor}</div>
+          </div>
+          <div class="meta-cell">
+            <div class="meta-cell-label">Cost</div>
+            <div class="meta-cell-val ${t.costType}">${t.cost}</div>
+          </div>
+          <div class="meta-cell" style="grid-column:1/-1;">
+            <div class="meta-cell-label">Setup difficulty (1 = anyone · 5 = needs a developer)</div>
+            ${buildDots(t.setup)}
+            <div class="setup-sub">${t.setupLabel}</div>
+          </div>
+        </div>
+        <div class="avoid-strip"><strong>Avoid if:</strong> ${t.avoid}</div>
+      </div>`;
+  }
+
+  document.getElementById('emptyState').style.display = 'none';
+  document.getElementById('resultsGrid').classList.remove('hidden');
+  document.getElementById('resultsGrid').scrollIntoView({ behavior:'smooth', block:'start' });
+}
+
+function resetTool() {
+  document.getElementById('resultsGrid').classList.add('hidden');
+  document.getElementById('emptyState').style.display = 'block';
+  document.getElementById('taskInput').value = '';
+  document.getElementById('taskInput').focus();
+  window.scrollTo({ top:0, behavior:'smooth' });
+}
+
+document.getElementById('taskInput').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) analyse();
+});
+</script>
+</body>
+</html>
